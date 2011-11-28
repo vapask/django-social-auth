@@ -35,7 +35,7 @@ def associate_user(backend, user, uid, social_user=None, *args, **kwargs):
     try:
         social = UserSocialAuth.objects.create(user=user, uid=uid,
                                                provider=backend.name)
-    except IntegrityError:
+    except (IntegrityError, ValueError):
         # Protect for possible race condition, those bastard with FTL
         # clicking capabilities, check issue #131:
         #   https://github.com/omab/django-social-auth/issues/131
