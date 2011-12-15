@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect, HttpResponse, \
 from django.core.urlresolvers import reverse
 from django.contrib.auth import login, REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 
 from social_auth.backends import get_backend
@@ -37,6 +38,7 @@ SESSION_EXPIRATION = setting('SOCIAL_AUTH_SESSION_EXPIRATION', True)
 BACKEND_ERROR_REDIRECT = setting('SOCIAL_AUTH_BACKEND_ERROR_URL',
                                  LOGIN_ERROR_URL)
 SANITIZE_REDIRECTS = setting('SOCIAL_AUTH_SANITIZE_REDIRECTS', True)
+ERROR_MESSAGE = setting('LOGIN_ERROR_MESSAGE', None)
 
 
 def dsa_view(redirect_name=None):
@@ -146,6 +148,7 @@ def auth_process(request, backend):
 def complete_process(request, backend, *args, **kwargs):
     """Authentication complete process"""
     user = auth_complete(request, backend, *args, **kwargs)
+    redirect_value = request.session.pop(REDIRECT_FIELD_NAME, '')
 
     if user and getattr(user, 'is_active', True):
         login(request, user)
@@ -167,9 +170,11 @@ def complete_process(request, backend, *args, **kwargs):
         # send him to the new-users-page if defined.
         url = NEW_USER_REDIRECT if NEW_USER_REDIRECT and \
                                    getattr(user, 'is_new', False) else \
-              request.session.pop(REDIRECT_FIELD_NAME, '') or \
+              redirect_value or \
               DEFAULT_REDIRECT
     else:
+        if ERROR_MESSAGE:
+            messages.error(request, ERROR_MESSAGE)
         url = LOGIN_ERROR_URL
     return HttpResponseRedirect(url)
 
