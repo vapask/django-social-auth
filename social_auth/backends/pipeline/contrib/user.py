@@ -1,10 +1,9 @@
-from uuid import uuid4
-
 from django.conf import settings
 
 from social_auth.models import User
 from social_auth.signals import socialauth_not_registered
 
+from social_auth.backends.pipeline import warn_setting
 
 def create_user(backend, details, response, uid, username, user=None, *args,
                 **kwargs):
