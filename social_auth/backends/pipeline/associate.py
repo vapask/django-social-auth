@@ -16,7 +16,7 @@ def associate_by_email(details, *args, **kwargs):
         # only if it's a single object. ValueError is raised if multiple
         # objects are returned
         try:
-            return {'user': User.objects.get(email=email)}
+            return {'user': User.objects.get(email__iexact=email)}
         except MultipleObjectsReturned:
             raise ValueError('Not unique email address.')
         except User.DoesNotExist:
