@@ -1,3 +1,11 @@
+from uuid import uuid4
+
+from django.conf import settings
+
+from social_auth.models import User
+from social_auth.signals import socialauth_not_registered
+
+
 def create_user(backend, details, response, uid, username, user=None, *args,
                 **kwargs):
     """Create user without email. Depends on get_username pipeline."""
@@ -16,9 +24,8 @@ def create_user(backend, details, response, uid, username, user=None, *args,
                                        details=details)
         return None
 
-    email = details.get('email')
     return {
-        'user': User.objects.create_user(username=username, email=email),
+        'user': User.objects.create_user(username=username),
         'is_new': True
     }
 
