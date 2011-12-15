@@ -24,7 +24,7 @@ def create_user(backend, details, response, uid, username, user=None, *args,
         return None
 
     return {
-        'user': User.objects.create_user(username=username),
+        'user': User.objects.create_user(username=username, email=""),
         'is_new': True
     }
 
